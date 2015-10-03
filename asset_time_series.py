@@ -4,19 +4,21 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
+from wordcloud import WordCloud
 
 
 import glob
 import os
 
 #asset_ts_folder = '/home/till/devel/python/hz15_tsdata/Asset-Prices/'
-asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
+#asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
+asset_ts_folder =  '/Users/benedikt/Documents/Coding/StockEvaluator/Asset-Prices/'
 
 #generate features
 def get_week_performance(stock_close):
 
     latest_value = stock_close.values[0]
-    week_ago = stock_close.values[6]
+    week_ago = stock_close.values[5]
     perc_1 = 100.0/week_ago * (latest_value-week_ago)
     return perc_1
 
@@ -40,7 +42,7 @@ def get_performance_feature(stock_history):
     features = np.append(features, get_week_performance(close))
     features = np.append(features, get_month_performance(close))
     features = np.append(features, get_year_performance(close))
-              
+
     return features
 #END generate features
 
@@ -48,11 +50,20 @@ def get_performance_feature(stock_history):
 #Plot Graphs
 def draw_plot(stock_history,name):
     #print stock_history[[0]]
-    plt.plot(pd.to_datetime(stock_history.index,dayfirst=True),stock_history[["Close"]])
+    plotHandle = plt.plot(pd.to_datetime(stock_history.index,dayfirst=True),stock_history[["Close"]])
     red_patch = mpatches.Patch(color='blue', label=name)
     plt.legend(handles=[red_patch])
     plt.xlabel('Years', fontsize=18)
     plt.ylabel('Value', fontsize=16)
+    plotHandle.annotate('M&A event', xy=(10, 10), xytext=(10, 20),
+            arrowprops=dict(facecolor='red', shrink=0.05))
+    wordcloud = WordCloud().generate(text)
+    plt.imshow(wordcloud)
+    plt.axis("off")
+
+    wordcloud = WordCloud(max_font_size=40, relative_scaling=.5).generate(text)
+    plt.subfigure().imshow(wordcloud).axis("off").show()
+
     return plt
 
 #End Plot Graphs
