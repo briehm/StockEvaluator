@@ -14,9 +14,11 @@ time_frame = 30
 start_time = 1
 end_time = start_time + time_frame
 
+
+
 year = 250
 training_offset = 10
-test_offest = 251
+test_offest = 0
 
 
 SVM = 1
@@ -68,7 +70,7 @@ def predict_SVM(svm_,data):
 
 def get_label(dates_):
 
-    value = (dates_[0]-dates_[len(dates_)-1]) * 100/dates_[len(dates_)-1]
+    value = (dates_[0]-dates_[len(dates_)-1]) * 100.0/dates_[len(dates_)-1]
     label = 0
 
     if value > 1:
@@ -143,8 +145,10 @@ if __name__ == '__main__':
 
     files = at.get_all_filenames()
 
-    result = np.zeros((len(files), 30))
+    results = np.zeros((len(files), 30))
     all_dataframes = {at.parse_code(fn): at.load_data_frame_from_file(fn) for fn in files}
+
+    data = generate_trainings_data(all_dataframes,names)
 
     names = {at.parse_code(fn) for fn in files}
 
@@ -153,16 +157,21 @@ if __name__ == '__main__':
         print result.shape
         print result
 
-        data = generate_trainings_data(all_dataframes,names)
+        
 
-        data_test = generate_test_data(all_dataframes,names)
+        data_test = generate_test_data(all_dataframes,t,names)
+        
 
         if SVM:
             svm__ = train_SVM(data)
+            result = svm__
             print "SVM", predict_SVM(svm__,data_test)
 
         if RANDOM_FOREST:
             rdf_ = train_random_forest(data)
+            result = rdf_
             print "RF",predict_random_forest(rdf_,data_test)
+
+        results[,t]= result
 
 
