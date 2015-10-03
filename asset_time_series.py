@@ -7,13 +7,15 @@ import matplotlib.patches as mpatches
 from wordcloud import WordCloud
 import argparse
 
+from config import DATA_ROOT_DIR
+
 
 import glob
 import os
 
 #asset_ts_folder = '/home/till/devel/python/hz15_tsdata/Asset-Prices/'
 #asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
-asset_ts_folder =  '/Users/benedikt/Documents/Coding/StockEvaluator/Asset-Prices/'
+asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
 
 #generate features
 def get_interday_performance(stock_hist):
@@ -30,7 +32,7 @@ def get_week_performance(stock_close):
     if(len(stock_close)>=5):
         week_ago = stock_close.values[5]
         perc_1 = 100.0/week_ago * (latest_value-week_ago)
-    elif
+    else:
         prec_1 = 0
     return perc_1
 
@@ -40,16 +42,16 @@ def get_month_performance(stock_close):
     if(len(stock_close)>=25):
         month_ago = stock_close.values[25]
         perc_2 = 100.0/month_ago * (latest_value-month_ago)
-    elif
+    else:
         perc_2 = 0
     return perc_2
 
 def get_year_performance(stock_close):
-    latest_value = lc.values[0]
+    latest_value = stock_close.values[0]
     if(len(stock_close)>=250):
         year_ago = stock_close.values[250]
         perc_3 = 100.0/year_ago * (latest_value-year_ago)
-    elif
+    else:
         perc_3 = 0
     return perc_3
 
@@ -69,7 +71,7 @@ def get_performance_feature(stock_history):
 #Plot Graphs
 def draw_plot(stock_history,name):
     #print stock_history[[0]]
-    plotHandle = plt.plot(pd.to_datetime(stock_history.index,dayfirst=True),stock_history[["Close"]])
+    plotHandle = plt.plot(pd.to_datetime(stock_history.index,dayfirst=True), stock_history[["Close"]])
     red_patch = mpatches.Patch(color='blue', label=name)
     plt.legend(handles=[red_patch])
     plt.xlabel('Years', fontsize=18)
@@ -92,19 +94,26 @@ def draw_plot(stock_history,name):
 def load_data_frame_from_file(filename):
     return pd.read_csv(filename, infer_datetime_format=True, index_col=0)
 
-def load_stock_history(id, ticker_symbol):
-    name = os.path.join(asset_ts_folder, str(id)+"_"+ticker_symbol+'.csv')
-    return load_data_frame_from_file(name)
+# def load_stock_history(id, ticker_symbol):
+#     name = os.path.join(asset_ts_folder, str(id)+"_"+ticker_symbol+'.csv')
+#     return load_data_frame_from_file(name)
 
 def load_stock_history(ticker_symbol):
-    for file in get_all_filenames():
-        if file.find(ticker_symbol) != -1:
-            id = file.split('_')[0]
-    name = os.path.join(asset_ts_folder, str(id)+"_"+ticker_symbol+'.csv')
-    return load_data_frame_from_file(name)
+    id_ = ''
+    for filename in get_all_filenames():
+        if ticker_symbol in filename:
+            id_ = filename.split('_')[0]
+            print id_
+            break
+    if id_:
+        name = os.path.join(asset_ts_folder, "{}_{}.csv".format(id_, ticker_symbol))
+        return load_data_frame_from_file(name)
+    else:
+        return None
 
 def get_all_filenames():
-    return glob.glob(os.path.join(asset_ts_folder, '*.csv'))
+    full_names = glob.glob(os.path.join(asset_ts_folder, '*.csv'))
+    return [os.path.basename(name) for name in full_names]
 
 def parse_code(filename):
     basename = os.path.basename(filename)
@@ -115,17 +124,19 @@ def get_asset_price_feature_vector(asset, time):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s")
+    parser.add_argument("-s", help='The Ticker Symbol of the Stock to display, e.g. GOOGL')
     args = parser.parse_args()
     if args.s:
         history = load_stock_history(args.s)
-    else
 
-
-    # all_dataframes = {parse_code(fn): load_data_frame_from_file(fn) for fn in files}
-    # history = load_stock_history(9, "AES")
-    print history
-    feature = get_performance_feature(history)
-    print feature
-    pl = draw_plot(history,"AES")
-    pl.show()
+        # all_dataframes = {parse_code(fn): load_data_frame_from_file(fn) for fn in files}
+        # history = load_stock_history(9, "AES")
+        if history is not None:
+            feature = get_performance_feature(history)
+            print feature
+            pl = draw_plot(history, args.s)
+            pl.show()
+        else:
+            print "Please provide a valid ticker code"
+    else:
+        print 'Please provide a Stock Ticker Code with -s'
