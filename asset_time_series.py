@@ -15,34 +15,52 @@ import os
 asset_ts_folder =  '/Users/benedikt/Documents/Coding/StockEvaluator/Asset-Prices/'
 
 #generate features
+def get_interday_performance(stock_hist):
+
+    interday_open = stock_hist["Open"].values[0]
+    interday_close = stock_hist["Close"].values[0]
+    perc = 100.0/interday_open * (interday_close-interday_open)
+    return perc
+
+
 def get_week_performance(stock_close):
 
     latest_value = stock_close.values[0]
-    week_ago = stock_close.values[5]
-    perc_1 = 100.0/week_ago * (latest_value-week_ago)
+    if(len(stock_close)>=5):
+        week_ago = stock_close.values[5]
+        perc_1 = 100.0/week_ago * (latest_value-week_ago)
+    elif
+        prec_1 = 0
     return perc_1
 
 
 def get_month_performance(stock_close):
     latest_value = stock_close.values[0]
-    month_ago = stock_close.values[25]
-    perc_2 = 100.0/month_ago * (latest_value-month_ago)
+    if(len(stock_close)>=25):
+        month_ago = stock_close.values[25]
+        perc_2 = 100.0/month_ago * (latest_value-month_ago)
+    elif
+        perc_2 = 0
     return perc_2
 
 def get_year_performance(stock_close):
-    latest_value = stock_close.values[0]
-    year_ago = stock_close.values[250]
-    perc_3 = 100.0/year_ago * (latest_value-year_ago)
+    latest_value = lc.values[0]
+    if(len(stock_close)>=250):
+        year_ago = stock_close.values[250]
+        perc_3 = 100.0/year_ago * (latest_value-year_ago)
+    elif
+        perc_3 = 0
     return perc_3
 
 
 def get_performance_feature(stock_history):
     close = stock_history[["Close"]]
     features = []
+    features = np.append(features, get_interday_performance(stock_history))
     features = np.append(features, get_week_performance(close))
     features = np.append(features, get_month_performance(close))
     features = np.append(features, get_year_performance(close))
-
+              
     return features
 #END generate features
 

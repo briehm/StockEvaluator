@@ -124,6 +124,25 @@ def generate_test_data(dataframes,filenames):
 
 
 
+def generate_test_features(dataframes,t,filenames):
+    data = []
+    for name in filenames:
+        test_data = dataframes[name][0:test_offest]
+
+        for day in range(len(test_data)):
+            if day>=year:
+                from_ = day-year
+                until_ = day+1
+                features = at.get_performance_feature(test_data[from_:until_])
+                
+                data.append(features) 
+
+        
+    print len(data)
+    return np.array(data) 
+
+
+
 
 
 
@@ -143,34 +162,37 @@ def split_dataframes(dataframes,filenames):
 
 if __name__ == '__main__':
 
-    files = at.get_all_filenames()
-
     results = np.zeros((len(files), 30))
+
+    files = at.get_all_filenames()
+    names = {at.parse_code(fn) for fn in files}  
     all_dataframes = {at.parse_code(fn): at.load_data_frame_from_file(fn) for fn in files}
 
     data = generate_trainings_data(all_dataframes,names)
 
-    names = {at.parse_code(fn) for fn in files}
+    if SVM:
+        svm__ = train_SVM(data)
+
+    if RANDOM_FOREST:
+        rdf_ = train_random_forest(data)
+
+    
 
     for t in range(time_frame):
 
         print result.shape
-        print result
+        print result     
 
-        
+        #data_test = generate_test_data(all_dataframes,t,names)
 
-        data_test = generate_test_data(all_dataframes,t,names)
+        data_test = generate_test_features(all_dataframes,t,names)
         
 
         if SVM:
-            svm__ = train_SVM(data)
-            result = svm__
-            print "SVM", predict_SVM(svm__,data_test)
+            result = predict_SVM(svm__,data_test)
 
         if RANDOM_FOREST:
-            rdf_ = train_random_forest(data)
-            result = rdf_
-            print "RF",predict_random_forest(rdf_,data_test)
+            result = predict_random_forest(rdf_,data_test)
 
         results[,t]= result
 
