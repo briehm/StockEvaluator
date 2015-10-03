@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 from wordcloud import WordCloud
+import argparse
 
 
 import glob
@@ -60,7 +61,7 @@ def get_performance_feature(stock_history):
     features = np.append(features, get_week_performance(close))
     features = np.append(features, get_month_performance(close))
     features = np.append(features, get_year_performance(close))
-              
+
     return features
 #END generate features
 
@@ -73,14 +74,14 @@ def draw_plot(stock_history,name):
     plt.legend(handles=[red_patch])
     plt.xlabel('Years', fontsize=18)
     plt.ylabel('Value', fontsize=16)
-    plotHandle.annotate('M&A event', xy=(10, 10), xytext=(10, 20),
-            arrowprops=dict(facecolor='red', shrink=0.05))
-    wordcloud = WordCloud().generate(text)
-    plt.imshow(wordcloud)
-    plt.axis("off")
+    #plotHandle.annotate('M&A event', xy=(10, 10), xytext=(10, 20), arrowprops=dict(facecolor='red', shrink=0.05))
+    #for week in stock_history.index, STEPS
+    #    if abs( get_week_performance(stock_history[week]) ) > 5 %
+    #        get doc from company in t=week
+    #        -> generate wordcloud at position x=week
 
-    wordcloud = WordCloud(max_font_size=40, relative_scaling=.5).generate(text)
-    plt.subfigure().imshow(wordcloud).axis("off").show()
+    #wordcloud = WordCloud(max_font_size=40, relative_scaling=.5).generate(text)
+    #plt.subfigure().imshow(wordcloud).axis("off").show()
 
     return plt
 
@@ -95,6 +96,13 @@ def load_stock_history(id, ticker_symbol):
     name = os.path.join(asset_ts_folder, str(id)+"_"+ticker_symbol+'.csv')
     return load_data_frame_from_file(name)
 
+def load_stock_history(ticker_symbol):
+    for file in get_all_filenames():
+        if file.find(ticker_symbol) != -1:
+            id = file.split('_')[0]
+    name = os.path.join(asset_ts_folder, str(id)+"_"+ticker_symbol+'.csv')
+    return load_data_frame_from_file(name)
+
 def get_all_filenames():
     return glob.glob(os.path.join(asset_ts_folder, '*.csv'))
 
@@ -106,9 +114,16 @@ def get_asset_price_feature_vector(asset, time):
     pass
 
 if __name__ == '__main__':
-    files = get_all_filenames()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s")
+    args = parser.parse_args()
+    if args.s:
+        history = load_stock_history(args.s)
+    else
+
+
     # all_dataframes = {parse_code(fn): load_data_frame_from_file(fn) for fn in files}
-    history = load_stock_history(9, "AES")
+    # history = load_stock_history(9, "AES")
     print history
     feature = get_performance_feature(history)
     print feature
