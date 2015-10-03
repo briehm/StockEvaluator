@@ -1,10 +1,12 @@
-
+# -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
 import os
 from collections import Counter
 
-document_metadata_path = '/home/till/devel/python/hz15_tsdata/Metadata/MetaData_documents_2004_2010.csv'
+from config import DATA_ROOT_DIR
+
+document_metadata_path = os.path.join(DATA_ROOT_DIR, 'Metadata/MetaData_documents_2004_2010.csv')
 
 def get_all_metadata():
     big_df = pd.read_csv(document_metadata_path,
@@ -19,13 +21,12 @@ def get_all_metadata():
     big_df.NewsDate = pd.to_datetime(big_df.NewsDate, infer_datetime_format=True)
     return big_df
 
-
 def get_docs_by_source(source_):
     big_df = get_all_metadata()
     return big_df[(big_df.source == source_)]
 
-if __name__ == '__main__':
-    big_df = get_all_metadata()
-    ct = Counter(big_df.Label)
+# if __name__ == '__main__':
+#     big_df = get_all_metadata()
+#     ct = Counter(big_df.Label)
 
 
