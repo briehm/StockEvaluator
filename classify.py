@@ -1,25 +1,147 @@
 
-
+import asset_time_series as at
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
 
 import glob
 import os
 
+year = 250
+training_offset = 10
+test_offest = 251
 
 
-#generate features
-def svm_():
-    X = [[0, 0], [1, 1]]
-    y = [-1,0, 1]
+SVM = 1
+RANDOM_FOREST = 1
+
+
+#CLASSIFIER________________________
+
+
+#RANDOM_TREE____________________________________
+
+def train_random_forest(data):
+    rdt = RandomForestClassifier(n_estimators=5, max_depth=2,min_samples_split=1, random_state=0)
+    rdt.n_classes_ = 3
+    X = data[:,0:-1]
+    y = data[:,-1]
+    rdt.fit(X, y)  
+    return rdt
+
+
+def predict_random_forest(rdt,data):    
+    return rdt.predict(data)
+
+
+#SVM_________________________________________
+def train_SVM(data):
     clf = svm.SVC()
+    X = data[:,0:-1]
+    y = data[:,-1]
     clf.fit(X, y)  
-    clf.predict([[2., 2.]])
-    print clf.support_vectors_
+    return clf
+
+
+def predict_SVM(svm_,data):
+    svm_.predict(data)
+    return svm_.support_vectors_
+
+
+def get_label(dates_):
+
+    value = dates_[0]-dates_[len(dates_)-1]
+    label = 0
+
+    if value > 0.1:
+        label = 1
+    elif value < 0.1:
+        label = -1
+
+    return label    
+
+
+
+
+
+def generate_trainings_data(dataframes,filenames):
+    data = []
+    for name in filenames:
+        training_data = dataframes[name][test_offest:-1]
+
+        for day in range(len((training_data)-training_offset)/5):
+            if day>year:
+                label = get_label(training_data[day-year:day-year+training_offset]["Close"])
+                from_ = training_offset+day-year
+                until_ = day+training_offset+1
+                features = at.get_performance_feature(training_data[from_:until_])
+                #print features
+                temp = np.append(label,features)
+                data.append(temp) 
+
+
+        
+    print len(data)
+    return np.array(data) 
+
+
+def generate_test_data(dataframes,filenames):
+    data = []
+    for name in filenames:
+        test_data = dataframes[name][0:test_offest]
+
+        for day in range(len(test_data)):
+            if day>=year:
+                from_ = day-year
+                until_ = day+1
+                features = at.get_performance_feature(test_data[from_:until_])
+                
+                data.append(features) 
+
+        
+    print len(data)
+    return np.array(data) 
+
+
+
+
+
+
+
+
+def split_dataframes(dataframes,filenames):
+    test_data = []
+    training_data = []
+    for name in filenames:
+        print dataframes[name][0:2]
+        test_data = np.append(test_data, dataframes[name][0:3])
+        training_data = np.append(training_data,dataframes[name][3:-1])
+    return test_data,training_data
+
 
 
 
 if __name__ == '__main__':
-    svm_()
+    files = at.get_all_filenames()
+
+    all_dataframes = {at.parse_code(fn): at.load_data_frame_from_file(fn) for fn in files}
+
+    names = {at.parse_code(fn) for fn in files}
+    features = []
+
+    data = generate_trainings_data(all_dataframes,names)
+
+    data_test = generate_test_data(all_dataframes,names)
+    print data_test
+
+    if SVM:
+        svm__ = train_SVM(data)
+        print predict_SVM(svm__,data_test)
+
+    if RANDOM_FOREST:
+        rdf_ = train_random_forest(data)
+        print predict_random_forest(rdf_,data_test)
+
+
