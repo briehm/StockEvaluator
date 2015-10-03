@@ -7,20 +7,31 @@ import nltk
 
 
 def parse_businessweek_url(url):
+    # returns a tuple (headline, text)
     url = urllib.urlopen(url)
     url = url.geturl()
     page = requests.get(url)
     return parse_businessweek_html(page.text)
 
 def parse_businessweek_file(filename):
-    with open(filename) as fp:
-        return parse_businessweek_html('\n'.join(fp.readlines()))
+    # returns a tuple (headline, text)
+    try:
+        with open(filename) as fp:
+            return parse_businessweek_html('\n'.join(fp.readlines()))
+    except IOError as ioe:
+        return "", ""
 
 def parse_businessweek_html(html_text):
-    tree = lxml.html.fromstring(html_text)
+    try:
+        tree = lxml.html.fromstring(html_text)
+    except:
+        return "", ""
+
+    headline = tree.xpath("//h1[@class='headline']/text()")
+    headline = headline[0] if headline else ''
     paragraphs = tree.xpath("//div[@id='article_body']//p/text()")
     article_text = "\n".join(paragraphs).lower()
-    return article_text
+    return headline, article_text
 
 
 def tokenize_article(text):
