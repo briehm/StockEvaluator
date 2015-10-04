@@ -16,6 +16,7 @@ from config import DATA_ROOT_DIR
 from businessweek_parser import parse_businessweek_file, tokenize_article, clean_company_name, parse_businessweek_url
 
 from stock_metadata import MetadataLoader
+
 NUM_TEXTFILES = 150000
 
 if __name__ == "__main__":
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 
     matches = []
 
-    for filename, doc_id in zip(doc_data.relativeFilepath, doc_data.FileID)[0:NUM_TEXTFILES]:
+    for filename, doc_id in zip(doc_data.relativeFilepath, doc_data.id)[0:NUM_TEXTFILES]:
         filename = filename.replace('\\', '/')
         filename = os.path.join(DATA_ROOT_DIR, filename[1:])
         headline, text = parse_businessweek_file(filename)
