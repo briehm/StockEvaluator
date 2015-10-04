@@ -7,14 +7,13 @@ import matplotlib.patches as mpatches
 #from wordcloud import WordCloud
 import argparse
 
-from config import DATA_ROOT_DIR
+from stock_metadata import MetadataLoader
 
+from config import DATA_ROOT_DIR
 
 import glob
 import os
 
-#asset_ts_folder = '/home/till/devel/python/hz15_tsdata/Asset-Prices/'
-#asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
 asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
 
 #generate features
@@ -78,6 +77,7 @@ def draw_plot(stock_history,name):
     plt.legend(handles=[red_patch])
     plt.xlabel('Years', fontsize=18)
     plt.ylabel('Value', fontsize=16)
+    plt.title(name)
     #plotHandle.annotate('M&A event', xy=(10, 10), xytext=(10, 20), arrowprops=dict(facecolor='red', shrink=0.05))
     #for week in stock_history.index, STEPS
     #    if abs( get_week_performance(stock_history[week]) ) > 5 %
@@ -93,7 +93,7 @@ def draw_plot(stock_history,name):
 
 
 
-def load_data_frame_from_file(filename):
+def load_timeseries_dataframe_from_file(filename):
     return pd.read_csv(filename, infer_datetime_format=True, index_col=0)
 
 # def load_stock_history(id, ticker_symbol):
@@ -109,15 +109,27 @@ def load_stock_history(ticker_symbol):
             break
     if id_:
         name = os.path.join(asset_ts_folder, "{}_{}.csv".format(id_, ticker_symbol))
-        return load_data_frame_from_file(name)
+        return load_timeseries_dataframe_from_file(name)
     else:
         return None
+
+
+def load_stock_history_from_id(stock_id):
+    stock_ticker_dict = MetadataLoader().get_id_to_ticker_dict()
+    try:
+        ticker_symbol = stock_ticker_dict[stock_id]
+    except KeyError as ke:
+        print "Invalid Stock ID {}".format(stock_id)
+        return None
+
+    ts_filename = os.path.join(asset_ts_folder, "{}_{}.csv".format(stock_id, ticker_symbol))
+    return load_timeseries_dataframe_from_file(ts_filename)
 
 def get_all_filenames():
     full_names = glob.glob(os.path.join(asset_ts_folder, '*.csv'))
     return [os.path.basename(name) for name in full_names]
 
-def get_all_filenames_old():
+def get_all_full_filenames():
     return glob.glob(os.path.join(asset_ts_folder, '*.csv'))
 
 def get_all_filenames_from_path(path_):
@@ -141,7 +153,6 @@ if __name__ == '__main__':
         # history = load_stock_history(9, "AES")
         if history is not None:
             feature = get_performance_feature(history)
-            print feature
             pl = draw_plot(history, args.s)
             pl.show()
         else:

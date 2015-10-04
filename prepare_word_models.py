@@ -15,17 +15,14 @@ from itertools import izip
 from config import DATA_ROOT_DIR
 from businessweek_parser import parse_businessweek_file, tokenize_article, clean_company_name, parse_businessweek_url
 
+from stock_metadata import MetadataLoader
 NUM_TEXTFILES = 150000
 
 if __name__ == "__main__":
 
     # 0.Step : get names of companies:
 
-    company_metadata_file = os.path.join(DATA_ROOT_DIR, 'Metadata/MetaData_SP500_edited.csv')
-    company_df = pd.read_csv(company_metadata_file,
-                             sep=';',
-                             dtype={'id': np.int, 'Ticker': np.str,
-                                    'Company': np.str})
+    company_df = MetadataLoader().get_stock_metadata()
 
     company_names = [clean_company_name(c) for c in company_df.Company]
     company_id_dict = dict(zip(company_names, company_df.id))
