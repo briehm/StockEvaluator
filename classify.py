@@ -21,7 +21,7 @@ training_offset = 10
 test_offest = 0
 
 
-SVM = 1
+SVM = 0
 RANDOM_FOREST = 1
 
 
@@ -34,7 +34,7 @@ def train_random_forest(data):
     rdt = RandomForestClassifier(n_estimators=5, max_depth=2,min_samples_split=1, random_state=0)
     rdt.n_classes_ = 3
     y = []
-    print rdt.n_classes_
+    print data.shape
     X = data[:,0:-1]
     z = data[:,-1]
     y = np.array(z)
@@ -88,7 +88,7 @@ def generate_trainings_data(dataframes,filenames):
     data = []
     for name in filenames:
         training_data = dataframes[name][test_offest:-1]
-
+        print training_data
         for day in range(len((training_data)-training_offset)/6):
             if day>year:
                 label = get_label(training_data[day-year:day-year+training_offset]["Close"])
@@ -161,10 +161,10 @@ def split_dataframes(dataframes,filenames):
 
 
 if __name__ == '__main__':
-
+    files = at.get_all_filenames_old()
     results = np.zeros((len(files), 30))
 
-    files = at.get_all_filenames()
+    
     names = {at.parse_code(fn) for fn in files}  
     all_dataframes = {at.parse_code(fn): at.load_data_frame_from_file(fn) for fn in files}
 

@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
-from wordcloud import WordCloud
+#from wordcloud import WordCloud
 import argparse
 
 from config import DATA_ROOT_DIR
@@ -14,8 +14,8 @@ import glob
 import os
 
 #asset_ts_folder = '/home/till/devel/python/hz15_tsdata/Asset-Prices/'
-#asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
-asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
+asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
+#asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
 
 #generate features
 def get_interday_performance(stock_hist):
@@ -114,6 +114,10 @@ def load_stock_history(ticker_symbol):
 def get_all_filenames():
     full_names = glob.glob(os.path.join(asset_ts_folder, '*.csv'))
     return [os.path.basename(name) for name in full_names]
+
+def get_all_filenames_old():
+    return glob.glob(os.path.join(asset_ts_folder, '*.csv'))
+
 
 def parse_code(filename):
     basename = os.path.basename(filename)
