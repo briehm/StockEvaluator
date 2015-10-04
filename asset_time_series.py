@@ -14,22 +14,25 @@ import glob
 import os
 
 #asset_ts_folder = '/home/till/devel/python/hz15_tsdata/Asset-Prices/'
-asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
-#asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
+#asset_ts_folder = '/Users/Seb/Stockdata/Asset-Prices/'
+asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
 
 #generate features
 def get_interday_performance(stock_hist):
-
-    interday_open = stock_hist["Open"].values[0]
-    interday_close = stock_hist["Close"].values[0]
-    perc = 100.0/interday_open * (interday_close-interday_open)
+    if(len(stock_hist)>=0):
+        interday_open = stock_hist["Open"].values[0]
+        interday_close = stock_hist["Close"].values[0]
+        perc = 100.0/interday_open * (interday_close-interday_open)
+    else:
+        prec = 0
     return perc
 
 
 def get_week_performance(stock_close):
 
-    latest_value = stock_close.values[0]
     if(len(stock_close)>=5):
+        latest_value = stock_close.values[0]
+    
         week_ago = stock_close.values[5]
         perc_1 = 100.0/week_ago * (latest_value-week_ago)
     else:
@@ -38,8 +41,8 @@ def get_week_performance(stock_close):
 
 
 def get_month_performance(stock_close):
-    latest_value = stock_close.values[0]
     if(len(stock_close)>=25):
+        latest_value = stock_close.values[0]
         month_ago = stock_close.values[25]
         perc_2 = 100.0/month_ago * (latest_value-month_ago)
     else:
@@ -47,8 +50,8 @@ def get_month_performance(stock_close):
     return perc_2
 
 def get_year_performance(stock_close):
-    latest_value = stock_close.values[0]
     if(len(stock_close)>=250):
+        latest_value = stock_close.values[0]
         year_ago = stock_close.values[250]
         perc_3 = 100.0/year_ago * (latest_value-year_ago)
     else:
