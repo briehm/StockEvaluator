@@ -78,7 +78,7 @@ def get_label(dates_):
 
     if value > 1.5:
         label = 1
-    elif value < -1.5:
+    elif value < -1.0:
         label = -1
 
     return label    
