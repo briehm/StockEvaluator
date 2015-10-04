@@ -19,43 +19,42 @@ asset_ts_folder = os.path.join(DATA_ROOT_DIR, 'Asset-Prices/')
 
 #generate features
 def get_interday_performance(stock_hist):
+    perc = 0
     if(len(stock_hist)>=0):
         interday_open = stock_hist["Open"].values[0]
         interday_close = stock_hist["Close"].values[0]
         perc = 100.0/interday_open * (interday_close-interday_open)
-    else:
-        prec = 0
+
     return perc
 
 
 def get_week_performance(stock_close):
 
-    if(len(stock_close)>=5):
-        latest_value = stock_close.values[0]
-    
+    perc_1 = 0
+    if(len(stock_close)>5):
+        latest_value = stock_close.values[0]   
         week_ago = stock_close.values[5]
         perc_1 = 100.0/week_ago * (latest_value-week_ago)
-    else:
-        prec_1 = 0
+
     return perc_1
 
 
 def get_month_performance(stock_close):
-    if(len(stock_close)>=25):
+
+    perc_2 = 0
+    if(len(stock_close)>25):
         latest_value = stock_close.values[0]
         month_ago = stock_close.values[25]
         perc_2 = 100.0/month_ago * (latest_value-month_ago)
-    else:
-        perc_2 = 0
+
     return perc_2
 
 def get_year_performance(stock_close):
-    if(len(stock_close)>=250):
+    perc_3 = 0
+    if(len(stock_close)>250):
         latest_value = stock_close.values[0]
         year_ago = stock_close.values[250]
         perc_3 = 100.0/year_ago * (latest_value-year_ago)
-    else:
-        perc_3 = 0
     return perc_3
 
 
@@ -121,6 +120,8 @@ def get_all_filenames():
 def get_all_filenames_old():
     return glob.glob(os.path.join(asset_ts_folder, '*.csv'))
 
+def get_all_filenames_from_path(path_):
+    return glob.glob(os.path.join(path_, '*.csv'))
 
 def parse_code(filename):
     basename = os.path.basename(filename)
