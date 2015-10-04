@@ -7,6 +7,7 @@ import matplotlib.patches as mpatches
 #from wordcloud import WordCloud
 import argparse
 
+from stock_metadata import MetadataLoader
 
 from config import DATA_ROOT_DIR
 
