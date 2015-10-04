@@ -124,11 +124,11 @@ def generate_test_data(dataframes,filenames):
 
 
 
-def generate_test_features(dataframes,t,filenames):
+def generate_test_features(dataframes,date,filenames):
     data = []
     for name in filenames:
-        test_data = dataframes[name][0:test_offest]
-
+        test_data = dataframes[name].index
+        break
         for day in range(len(test_data)):
             if day>=year:
                 from_ = day-year
@@ -194,6 +194,6 @@ if __name__ == '__main__':
         if RANDOM_FOREST:
             result = predict_random_forest(rdf_,data_test)
 
-        results[,t]= result
+        results[:,t]= result
 
 
