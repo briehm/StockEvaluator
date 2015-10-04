@@ -218,8 +218,8 @@ if __name__ == '__main__':
 
     
     names = {at.parse_code(fn) for fn in files_training}  
-    dataframes_training = {at.parse_code(fn): at.load_data_frame_from_file(fn) for fn in files_training}
-    dataframes_test = {at.parse_code(fn): at.load_data_frame_from_file(fn) for fn in files_test}
+    dataframes_training = {at.parse_code(fn): at.load_timeseries_dataframe_from_file(fn) for fn in files_training}
+    dataframes_test = {at.parse_code(fn): at.load_timeseries_dataframe_from_file(fn) for fn in files_test}
 
     results = np.zeros((len(names), time_frame ))
 
